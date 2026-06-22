@@ -15,15 +15,13 @@ const PLANNER = {
       priority: 1,
       deadline: "2026-06-30",
       deadlineNote: "원래 6/30 마감, 연장 가능성 있음",
-      note: "최우선. 연장되면 말해주면 뒤 일정 여유 있게 재배분함.",
+      note: "초안 작성 완료. 이제 실험 재확인 → 분석 → 결론 정리 단계. 연장되면 말해주면 뒤 일정 여유 있게 재배분함.",
       steps: [
-        { id: "p1-1", date: "2026-06-23", text: "논문 구조/개요 확정 + 핵심 기여(contribution) 3가지 한 문장씩 정리" },
-        { id: "p1-2", date: "2026-06-24", text: "실험 결과 정리 — 표/그래프 최종본 확정" },
-        { id: "p1-3", date: "2026-06-26", text: "Method + Experiments 섹션 작성" },
-        { id: "p1-4", date: "2026-06-27", text: "Introduction + Related Work 작성" },
-        { id: "p1-5", date: "2026-06-28", text: "Discussion + Conclusion + Abstract 작성" },
-        { id: "p1-6", date: "2026-06-29", text: "전체 통합 초안 완성 (figure·reference 점검)" },
-        { id: "p1-7", date: "2026-06-30", text: "교정·다듬기 후 제출 (연장 시 추가 보완)" }
+        { id: "p1-1", date: "2026-06-23", text: "실험 결과 재검토 — 재현 확인, 누락·오류 체크" },
+        { id: "p1-2", date: "2026-06-25", text: "분석 정리 — 결과 해석, 표/그래프 보완·확정" },
+        { id: "p1-3", date: "2026-06-27", text: "결론(Discussion + Conclusion) 다시 정리" },
+        { id: "p1-4", date: "2026-06-29", text: "전체 초안 재검토 + 다듬기 (figure·reference 점검)" },
+        { id: "p1-5", date: "2026-06-30", text: "최종 교정 후 제출 (연장 시 추가 보완)" }
       ]
     },
 
@@ -32,14 +30,17 @@ const PLANNER = {
       id: "nrf",
       title: "NRF 제안서 — 페르소나 + 장기대화",
       priority: 2,
-      deadline: null,
-      deadlineNote: "기한 미정 — 알려주면 일정 재배분함",
-      note: "논문 마감(6/30) 직후 본격 착수하는 임시 일정. 실제 마감일 알려주면 다시 짜줌.",
+      deadline: "2026-08-05",
+      deadlineNote: "대략 8월 초 (확정 아님)",
+      note: "방향: on-device LLM은 크기 제약으로 general 정보 보유가 어려움 → 실생활 사용 위해 자율적 정보 관리 필수. KG(Wikidata/DBPedia 등)에 실생활 정보를 저장하고, 대화 중 사용자 정보(페르소나·대화)를 트리플화해 그래프에 추가. 핵심 모듈: graph construction, triple extraction, persona triple extraction, SLM distillation, graph completion, graph conflict detection, graph fusion.",
       steps: [
-        { id: "nrf-1", date: "2026-07-01", text: "제안서 구조 잡기 + 페르소나·장기대화를 잇는 핵심 아이디어 정리" },
-        { id: "nrf-2", date: "2026-07-03", text: "연구 배경·필요성, 선행연구 작성" },
-        { id: "nrf-3", date: "2026-07-04", text: "연구 목표·내용·추진 방법 작성" },
-        { id: "nrf-4", date: "2026-07-05", text: "기대효과·연구계획 + 전체 다듬기" }
+        { id: "nrf-1", date: "2026-07-01", text: "배경·필요성 초안 — on-device LLM 한계 + 자율적 정보 관리 필요성 정리" },
+        { id: "nrf-2", date: "2026-07-08", text: "관련 KG 자원 조사(Wikidata, DBPedia 등) + 그래프 저장 구조 설계" },
+        { id: "nrf-3", date: "2026-07-15", text: "Triple extraction + persona triple extraction 모듈 설계" },
+        { id: "nrf-4", date: "2026-07-22", text: "Graph construction + SLM distillation 방법론 정리" },
+        { id: "nrf-5", date: "2026-07-27", text: "Graph completion + conflict detection + fusion 방법론 정리" },
+        { id: "nrf-6", date: "2026-08-01", text: "연구목표·추진방법·기대효과 통합 작성" },
+        { id: "nrf-7", date: "2026-08-05", text: "전체 다듬기 + 제출" }
       ]
     },
 
@@ -50,10 +51,12 @@ const PLANNER = {
       priority: 1,
       deadline: "2026-06-28",
       deadlineNote: "이번 주말 안에",
-      note: "짧은 일이지만 주말 놓치기 쉬움. 토요일에 알림.",
+      note: "수동 확인 대신 Claude로 자동 예약 구현.",
       steps: [
-        { id: "ns-1", date: "2026-06-27", text: "예약 페이지/조건 확인 (가격·수량·마감)" },
-        { id: "ns-2", date: "2026-06-28", text: "예약 진행 완료" }
+        { id: "ns-1", date: "2026-06-24", text: "예약 페이지 구조·조건(가격·수량·오픈시간) 파악 + 자동화 가능 여부 확인" },
+        { id: "ns-2", date: "2026-06-25", text: "자동 예약 플로우 구현 (브라우저 자동화 / computer-use)" },
+        { id: "ns-3", date: "2026-06-26", text: "테스트 실행 — 버튼 위치·플로우 검증 (실제 결제 직전까지)" },
+        { id: "ns-4", date: "2026-06-28", text: "실제 예약 오픈 시 자동 실행 + 결제 직전 사용자 확인" }
       ]
     },
 
