@@ -62,6 +62,22 @@ const PLANNER = {
 
     // ───────────────────────────────────────────────
     {
+      id: "helea-rebuttal",
+      title: "HELEA 논문 리부탈 대비 — OOD 실험",
+      priority: 1,
+      deadline: "2026-07-03",
+      deadlineNote: "리부탈 7월 초 예정 (정확한 날짜 알려주면 재배분)",
+      note: "우선 OOD 데이터에 대한 실험부터 진행.",
+      steps: [
+        { id: "helea-1", date: "2026-06-24", text: "OOD 데이터셋 선정 + 실험 세팅 구성" },
+        { id: "helea-2", date: "2026-06-27", text: "OOD 실험 1차 실행" },
+        { id: "helea-3", date: "2026-06-30", text: "결과 분석 + 추가 실험 필요 여부 판단" },
+        { id: "helea-4", date: "2026-07-03", text: "리부탈용 결과 정리 (표·설명 초안)" }
+      ]
+    },
+
+    // ───────────────────────────────────────────────
+    {
       id: "next-topic",
       title: "다음 논문 주제 구상",
       priority: 3,
