@@ -62,7 +62,10 @@
     border-radius:14px;padding:14px 16px;margin-bottom:13px;backdrop-filter:blur(2px);
     transition:background-color .15s}
   .card.done{opacity:.55}
-  .chead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .chead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;cursor:pointer}
+  .chevron{font-size:11px;color:var(--muted);transition:transform .15s;flex-shrink:0}
+  .card.collapsed .chevron{transform:rotate(-90deg)}
+  .card.collapsed ul,.card.collapsed .note{display:none}
   .ttl{font-size:15px;font-weight:650;flex:1;min-width:160px}
   .dday{font-size:12px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
   .dday.red{background:color-mix(in srgb,var(--red) 18%,transparent);color:var(--red)}
@@ -163,6 +166,10 @@ const KEY="planner_checks_v1";
 const checks=JSON.parse(localStorage.getItem(KEY)||"{}");
 const saveChecks=()=>localStorage.setItem(KEY,JSON.stringify(checks));
 
+const KEY2="planner_expanded_v1";
+const expanded=JSON.parse(localStorage.getItem(KEY2)||"{}");
+const saveExpanded=()=>localStorage.setItem(KEY2,JSON.stringify(expanded));
+
 function render(){
   $("#today").textContent=fmtDate(todayStr)+" 기준";
   $("#updated").textContent=PLANNER.updated;
@@ -179,10 +186,12 @@ function render(){
     total+=tot;done+=d;
     const allDone=d===tot&&tot>0;
     const dl=ddayLabel(t.deadline);
+    const isOpen=expanded.hasOwnProperty(t.id)?expanded[t.id]:(dl.cls==='red'&&!allDone);
     const card=document.createElement("div");
-    card.className="card"+(allDone?" done":"");
+    card.className="card"+(allDone?" done":"")+(isOpen?"":" collapsed");
     card.innerHTML=`
       <div class="chead">
+        <span class="chevron">▾</span>
         <div class="ttl">${t.title}</div>
         <div class="dday ${allDone?'green':dl.cls}">${allDone?'완료 ✓':dl.txt}</div>
       </div>
@@ -191,6 +200,12 @@ function render(){
       <div class="bar"><div style="width:${tot?d/tot*100:0}%"></div></div>
       <div class="prog">${d}/${tot} 완료</div>
       <ul></ul>`;
+    card.querySelector(".chead").addEventListener("click",()=>{
+      const willBeCollapsed=!card.classList.contains("collapsed");
+      card.classList.toggle("collapsed",willBeCollapsed);
+      expanded[t.id]=!willBeCollapsed;
+      saveExpanded();
+    });
     const ul=card.querySelector("ul");
     t.steps.forEach(s=>{
       const li=document.createElement("li");
