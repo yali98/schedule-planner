@@ -40,6 +40,8 @@
   #bar button:hover{background:var(--panel2);color:var(--txt)}
   #bar button.on{color:#fff;background:var(--accent);box-shadow:0 0 0 1px var(--accent)}
   #bar button.on:hover{background:var(--accent);opacity:.9}
+  #bar button:disabled{opacity:.35;cursor:default}
+  #bar button:disabled:hover{background:transparent;color:var(--muted)}
   .winbtns{display:none;gap:2px}
   body.electron .winbtns{display:flex}
   body.electron #opacWrap{display:flex}
@@ -65,7 +67,10 @@
   .chead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;cursor:pointer}
   .chevron{font-size:11px;color:var(--muted);transition:transform .15s;flex-shrink:0}
   .card.collapsed .chevron{transform:rotate(-90deg)}
-  .card.collapsed ul,.card.collapsed .note{display:none}
+  .card.collapsed .note{display:none}
+  .card.collapsed ul{display:block;margin-top:6px}
+  .card.collapsed li:not(.urgent){display:none}
+  .card.collapsed li.urgent{background:color-mix(in srgb,var(--red) 10%,transparent);border-radius:8px}
   .ttl{font-size:15px;font-weight:650;flex:1;min-width:160px}
   .dday{font-size:12px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
   .dday.red{background:color-mix(in srgb,var(--red) 18%,transparent);color:var(--red)}
@@ -116,6 +121,7 @@
 <div id="bar">
   <span class="grip">📌 스케줄플래너</span>
   <div class="ctl">
+    <button id="undo" title="마지막 체크 취소" disabled>↺</button>
     <span id="opacWrap">투명 <input type="range" id="opac" min="25" max="100" value="100"></span>
     <div class="winbtns">
       <button id="pin" title="항상 위에">📍</button>
@@ -170,6 +176,17 @@ const KEY2="planner_expanded_v1";
 const expanded=JSON.parse(localStorage.getItem(KEY2)||"{}");
 const saveExpanded=()=>localStorage.setItem(KEY2,JSON.stringify(expanded));
 
+const undoStack=[];
+function setChecked(stepId,checked){
+  if(checked&&!checks[stepId]) undoStack.push(stepId);
+  checks[stepId]=checked;
+  saveChecks();
+  render();
+}
+function updateUndoBtn(){
+  $("#undo").disabled=undoStack.length===0;
+}
+
 function render(){
   $("#today").textContent=fmtDate(todayStr)+" 기준";
   $("#updated").textContent=PLANNER.updated;
@@ -209,23 +226,27 @@ function render(){
     const ul=card.querySelector("ul");
     t.steps.forEach(s=>{
       const li=document.createElement("li");
-      const c=!!checks[s.id];if(c)li.className="chk";
+      const c=!!checks[s.id];
       const over=!c&&daysBetween(todayStr,s.date)<0;
+      const urgent=!c&&daysBetween(todayStr,s.date)<=1;
+      li.className=[c?"chk":"",urgent?"urgent":""].join(" ").trim();
       li.innerHTML=`<input type="checkbox" ${c?'checked':''}>
         <div><div class="txt">${s.text}</div>
         <div><span class="sdate ${over?'late':''}">${fmtDate(s.date)}${over?' · 지남':''}</span></div></div>`;
-      li.querySelector("input").addEventListener("change",e=>{checks[s.id]=e.target.checked;saveChecks();render();});
+      li.querySelector("input").addEventListener("change",e=>setChecked(s.id,e.target.checked));
       ul.appendChild(li);
     });
     cards.appendChild(card);
   });
   $("#overallBar").style.width=(total?done/total*100:0)+"%";
+  updateUndoBtn();
   renderTimeline();
 }
 
 function renderTimeline(){
   const byDate={};
   PLANNER.tasks.forEach(t=>t.steps.forEach(s=>{
+    if(checks[s.id]) return;
     (byDate[s.date]=byDate[s.date]||[]).push({step:s,taskTitle:t.title});
   }));
   const dates=Object.keys(byDate).sort();
@@ -244,10 +265,9 @@ function renderTimeline(){
     const ul=block.querySelector("ul");
     byDate[date].forEach(({step:s,taskTitle})=>{
       const li=document.createElement("li");
-      const c=!!checks[s.id];if(c)li.className="chk";
-      li.innerHTML=`<input type="checkbox" ${c?'checked':''}>
+      li.innerHTML=`<input type="checkbox">
         <div><div class="txt">${s.text}</div><div class="tasktag">${taskTitle}</div></div>`;
-      li.querySelector("input").addEventListener("change",e=>{checks[s.id]=e.target.checked;saveChecks();render();});
+      li.querySelector("input").addEventListener("change",e=>setChecked(s.id,e.target.checked));
       ul.appendChild(li);
     });
     wrap.appendChild(block);
@@ -255,6 +275,15 @@ function renderTimeline(){
 }
 
 render();
+
+// ── 체크 취소 ──
+$("#undo").addEventListener("click",()=>{
+  const last=undoStack.pop();
+  if(!last) return;
+  checks[last]=false;
+  saveChecks();
+  render();
+});
 
 // ── 보기 전환 (작업별 / 날짜별) ──
 document.querySelectorAll(".tabbtn").forEach(btn=>{
