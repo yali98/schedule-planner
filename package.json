@@ -1,0 +1,12 @@
+{
+  "name": "schedule-planner",
+  "version": "1.0.0",
+  "description": "나의 스케줄 · 플래너 (투명 데스크톱 위젯)",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^31.0.0"
+  }
+}
