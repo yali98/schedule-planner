@@ -133,6 +133,22 @@
   </div>
 </div>
 
+<div id="syncModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;align-items:center;justify-content:center">
+  <div style="background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:16px;width:88%;max-width:300px;-webkit-app-region:no-drag">
+    <div style="font-size:13.5px;font-weight:650;margin-bottom:10px">기기 간 동기화 설정</div>
+    <label style="font-size:11.5px;color:var(--muted)">GitHub Token (gist 권한)</label>
+    <input id="syncTokenInput" type="text" style="width:100%;margin:4px 0 10px;padding:6px 8px;border-radius:7px;border:1px solid var(--line);background:transparent;color:var(--txt);font-size:12.5px">
+    <label style="font-size:11.5px;color:var(--muted)">Gist ID (처음 설정이면 비워두기)</label>
+    <input id="syncGistInput" type="text" style="width:100%;margin:4px 0 10px;padding:6px 8px;border-radius:7px;border:1px solid var(--line);background:transparent;color:var(--txt);font-size:12.5px">
+    <div id="syncMsg" style="font-size:11px;color:var(--muted);min-height:14px;margin-bottom:8px"></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button id="syncSave" style="flex:1;padding:6px 10px;border-radius:7px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;font-size:12.5px">저장</button>
+      <button id="syncOff" style="padding:6px 10px;border-radius:7px;border:1px solid var(--line);background:transparent;color:var(--txt);cursor:pointer;font-size:12.5px">동기화 끄기</button>
+      <button id="syncCancel" style="padding:6px 10px;border-radius:7px;border:1px solid var(--line);background:transparent;color:var(--txt);cursor:pointer;font-size:12.5px">닫기</button>
+    </div>
+  </div>
+</div>
+
 <div id="scroll">
   <div class="topline">
     <h1>나의 스케줄 · 플래너</h1>
@@ -376,32 +392,43 @@ $("#undo").addEventListener("click",()=>{
   schedulePush();
 });
 
-// ── 동기화 설정 ──
-$("#sync").addEventListener("click",async()=>{
-  const tokenInput=window.prompt("GitHub Personal Access Token 입력 (gist 권한 필요).\n비워두고 확인하면 동기화를 끕니다.", getToken());
-  if(tokenInput===null) return;
-  if(tokenInput.trim()===""){
-    localStorage.removeItem(SYNC_TOKEN_KEY);
-    localStorage.removeItem(SYNC_GIST_KEY);
-    setSyncStatus("");
-    return;
-  }
-  localStorage.setItem(SYNC_TOKEN_KEY,tokenInput.trim());
+// ── 동기화 설정 (window.prompt는 Electron에서 미지원이라 커스텀 모달 사용) ──
+function openSyncModal(){
+  $("#syncTokenInput").value=getToken();
+  $("#syncGistInput").value=getGistId();
+  $("#syncMsg").textContent="";
+  $("#syncModal").style.display="flex";
+}
+function closeSyncModal(){ $("#syncModal").style.display="none"; }
 
-  const gistInput=window.prompt("다른 기기에서 이미 동기화를 설정했다면, 그때 알려준 Gist ID를 입력하세요.\n처음 설정하는 거면 비워두세요.", getGistId());
-  if(gistInput&&gistInput.trim()!=="") localStorage.setItem(SYNC_GIST_KEY,gistInput.trim());
+$("#sync").addEventListener("click",openSyncModal);
+$("#syncCancel").addEventListener("click",closeSyncModal);
+$("#syncModal").addEventListener("click",e=>{ if(e.target.id==="syncModal") closeSyncModal(); });
 
+$("#syncOff").addEventListener("click",()=>{
+  localStorage.removeItem(SYNC_TOKEN_KEY);
+  localStorage.removeItem(SYNC_GIST_KEY);
+  setSyncStatus("");
+  closeSyncModal();
+});
+
+$("#syncSave").addEventListener("click",async()=>{
+  const token=$("#syncTokenInput").value.trim();
+  const gistInput=$("#syncGistInput").value.trim();
+  const msg=$("#syncMsg");
+  if(!token){ msg.textContent="토큰을 입력하세요."; return; }
+  localStorage.setItem(SYNC_TOKEN_KEY,token);
+  if(gistInput) localStorage.setItem(SYNC_GIST_KEY,gistInput);
+
+  msg.textContent="연결 중...";
   try{
     const id=await ensureGist();
     await pullAndMerge();
     await pushToGist();
-    if(!gistInput||gistInput.trim()===""){
-      alert("동기화 설정 완료!\nGist ID: "+id+"\n\n다른 기기에서도 🔄 버튼을 눌러 같은 토큰과 이 Gist ID를 입력하면 연결됩니다.");
-    }else{
-      alert("동기화 설정 완료!");
-    }
+    msg.textContent = gistInput ? "동기화 설정 완료!" : `설정 완료! Gist ID: ${id} (다른 기기에서 이 ID로 연결)`;
+    $("#syncGistInput").value=id;
   }catch(e){
-    alert("동기화 설정 실패: "+e.message);
+    msg.textContent="설정 실패: "+e.message;
   }
 });
 
