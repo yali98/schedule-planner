@@ -85,6 +85,26 @@
   .sdate.late{color:var(--red);font-weight:600}
   .foot{color:var(--muted);font-size:11px;text-align:center;margin-top:24px;line-height:1.7}
   code{background:var(--panel2);padding:1px 6px;border-radius:6px;font-size:11px}
+
+  .tabs{display:flex;gap:6px;margin-bottom:14px}
+  .tabbtn{background:transparent;border:1px solid var(--line);color:var(--muted);
+    font-size:12px;padding:5px 13px;border-radius:99px;cursor:pointer}
+  .tabbtn:hover{color:var(--txt)}
+  .tabbtn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+  .dayblock{margin-bottom:16px}
+  .dayblock.today .daydate{color:var(--accent)}
+  .dayhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .daydate{font-size:13.5px;font-weight:700}
+  .daydday{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:99px}
+  .daylist{list-style:none;margin:0;padding:0;border-radius:12px;overflow:hidden;
+    background:rgba(var(--panel),calc(var(--panelAlpha) * var(--bgOpacity,1)));
+    border:1px solid var(--line)}
+  .daylist li{display:flex;align-items:flex-start;gap:9px;padding:9px 12px}
+  .daylist li:not(:last-child){border-bottom:1px solid var(--line)}
+  .daylist li:hover{background:var(--panel2)}
+  .daylist li.chk .txt{text-decoration:line-through;color:var(--muted)}
+  .tasktag{font-size:10.5px;color:var(--muted);margin-top:2px}
 </style>
 </head>
 <body>
@@ -109,7 +129,12 @@
   </div>
   <p class="sub">계획 수정은 Claude 세션에 말로 부탁하세요 · 완료 체크는 자동 저장</p>
   <div class="overall"><div id="overallBar"></div></div>
+  <div class="tabs">
+    <button class="tabbtn active" data-view="cards">작업별</button>
+    <button class="tabbtn" data-view="timeline">날짜별</button>
+  </div>
   <div id="cards"></div>
+  <div id="timeline" style="display:none"></div>
   <div class="foot">
     데이터 <code>tasks.js</code> · 마지막 계획 갱신 <span id="updated"></span>
   </div>
@@ -180,8 +205,52 @@ function render(){
     cards.appendChild(card);
   });
   $("#overallBar").style.width=(total?done/total*100:0)+"%";
+  renderTimeline();
 }
+
+function renderTimeline(){
+  const byDate={};
+  PLANNER.tasks.forEach(t=>t.steps.forEach(s=>{
+    (byDate[s.date]=byDate[s.date]||[]).push({step:s,taskTitle:t.title});
+  }));
+  const dates=Object.keys(byDate).sort();
+  const wrap=$("#timeline");wrap.innerHTML="";
+  dates.forEach(date=>{
+    const isToday=date===todayStr;
+    const dl=ddayLabel(date);
+    const block=document.createElement("div");
+    block.className="dayblock"+(isToday?" today":"");
+    block.innerHTML=`
+      <div class="dayhead">
+        <span class="daydate">${fmtDate(date)}${isToday?' · 오늘':''}</span>
+        <span class="daydday dday ${dl.cls}">${dl.txt}</span>
+      </div>
+      <ul class="daylist"></ul>`;
+    const ul=block.querySelector("ul");
+    byDate[date].forEach(({step:s,taskTitle})=>{
+      const li=document.createElement("li");
+      const c=!!checks[s.id];if(c)li.className="chk";
+      li.innerHTML=`<input type="checkbox" ${c?'checked':''}>
+        <div><div class="txt">${s.text}</div><div class="tasktag">${taskTitle}</div></div>`;
+      li.querySelector("input").addEventListener("change",e=>{checks[s.id]=e.target.checked;saveChecks();render();});
+      ul.appendChild(li);
+    });
+    wrap.appendChild(block);
+  });
+}
+
 render();
+
+// ── 보기 전환 (작업별 / 날짜별) ──
+document.querySelectorAll(".tabbtn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".tabbtn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const view=btn.dataset.view;
+    $("#cards").style.display=view==="cards"?"":"none";
+    $("#timeline").style.display=view==="timeline"?"":"none";
+  });
+});
 
 // ── 투명도 슬라이더 ──
 $("#opac").addEventListener("input",e=>{
