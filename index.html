@@ -122,6 +122,8 @@
   <span class="grip">📌 스케줄플래너</span>
   <div class="ctl">
     <button id="undo" title="마지막 체크 취소" disabled>↺</button>
+    <button id="sync" title="기기 간 동기화 설정">🔄</button>
+    <span id="syncStatus" style="font-size:10.5px;color:var(--muted)"></span>
     <span id="opacWrap">투명 <input type="range" id="opac" min="25" max="100" value="100"></span>
     <div class="winbtns">
       <button id="pin" title="항상 위에">📍</button>
@@ -176,12 +178,98 @@ const KEY2="planner_expanded_v1";
 const expanded=JSON.parse(localStorage.getItem(KEY2)||"{}");
 const saveExpanded=()=>localStorage.setItem(KEY2,JSON.stringify(expanded));
 
+const KEY3="planner_meta_v1";
+const meta=JSON.parse(localStorage.getItem(KEY3)||"{}");
+const saveMeta=()=>localStorage.setItem(KEY3,JSON.stringify(meta));
+
+// ── 기기 간 동기화 (GitHub Gist) ──
+const SYNC_TOKEN_KEY="planner_gh_token";
+const SYNC_GIST_KEY="planner_gist_id";
+const SYNC_FILENAME="planner-sync.json";
+const getToken=()=>localStorage.getItem(SYNC_TOKEN_KEY)||"";
+const getGistId=()=>localStorage.getItem(SYNC_GIST_KEY)||"";
+
+function setSyncStatus(s){
+  const el=$("#syncStatus");
+  if(!el) return;
+  const now=new Date();
+  const hhmm=`${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  el.textContent = s==="ok" ? `동기화 ${hhmm}` : s==="error" ? "동기화 오류" : "";
+}
+
+async function ghFetch(url,opts={}){
+  const token=getToken();
+  if(!token) throw new Error("토큰 없음");
+  return fetch(url,{...opts,headers:{
+    "Authorization":`Bearer ${token}`,
+    "Accept":"application/vnd.github+json",
+    ...(opts.headers||{})
+  }});
+}
+
+async function ensureGist(){
+  let id=getGistId();
+  if(id) return id;
+  const res=await ghFetch("https://api.github.com/gists",{
+    method:"POST",
+    body:JSON.stringify({description:"스케줄플래너 체크 동기화",public:false,
+      files:{[SYNC_FILENAME]:{content:JSON.stringify({checks:{},ts:{}})}}})
+  });
+  if(!res.ok) throw new Error("Gist 생성 실패 ("+res.status+")");
+  const data=await res.json();
+  localStorage.setItem(SYNC_GIST_KEY,data.id);
+  return data.id;
+}
+
+async function pullAndMerge(){
+  if(!getToken()||!getGistId()) return;
+  try{
+    const res=await ghFetch(`https://api.github.com/gists/${getGistId()}`);
+    if(!res.ok) throw new Error("pull 실패");
+    const data=await res.json();
+    const file=data.files[SYNC_FILENAME];
+    if(!file) return;
+    const remote=JSON.parse(file.content||"{}");
+    let changed=false;
+    Object.keys(remote.ts||{}).forEach(k=>{
+      const rts=remote.ts[k];
+      if(!meta[k]||rts>meta[k]){
+        if(checks[k]!==remote.checks[k]){ checks[k]=remote.checks[k]; changed=true; }
+        meta[k]=rts;
+      }
+    });
+    if(changed){ saveChecks(); saveMeta(); render(); }
+    setSyncStatus("ok");
+  }catch(e){ setSyncStatus("error"); }
+}
+
+let pushTimer=null;
+function schedulePush(){
+  clearTimeout(pushTimer);
+  pushTimer=setTimeout(pushToGist,800);
+}
+async function pushToGist(){
+  if(!getToken()) return;
+  try{
+    const id=await ensureGist();
+    const res=await ghFetch(`https://api.github.com/gists/${id}`,{
+      method:"PATCH",
+      body:JSON.stringify({files:{[SYNC_FILENAME]:{content:JSON.stringify({checks,ts:meta})}}})
+    });
+    if(!res.ok) throw new Error("push 실패");
+    setSyncStatus("ok");
+  }catch(e){ setSyncStatus("error"); }
+}
+
 const undoStack=[];
 function setChecked(stepId,checked){
   if(checked&&!checks[stepId]) undoStack.push(stepId);
   checks[stepId]=checked;
+  meta[stepId]=Date.now();
   saveChecks();
+  saveMeta();
   render();
+  schedulePush();
 }
 function updateUndoBtn(){
   $("#undo").disabled=undoStack.length===0;
@@ -281,9 +369,46 @@ $("#undo").addEventListener("click",()=>{
   const last=undoStack.pop();
   if(!last) return;
   checks[last]=false;
+  meta[last]=Date.now();
   saveChecks();
+  saveMeta();
   render();
+  schedulePush();
 });
+
+// ── 동기화 설정 ──
+$("#sync").addEventListener("click",async()=>{
+  const tokenInput=window.prompt("GitHub Personal Access Token 입력 (gist 권한 필요).\n비워두고 확인하면 동기화를 끕니다.", getToken());
+  if(tokenInput===null) return;
+  if(tokenInput.trim()===""){
+    localStorage.removeItem(SYNC_TOKEN_KEY);
+    localStorage.removeItem(SYNC_GIST_KEY);
+    setSyncStatus("");
+    return;
+  }
+  localStorage.setItem(SYNC_TOKEN_KEY,tokenInput.trim());
+
+  const gistInput=window.prompt("다른 기기에서 이미 동기화를 설정했다면, 그때 알려준 Gist ID를 입력하세요.\n처음 설정하는 거면 비워두세요.", getGistId());
+  if(gistInput&&gistInput.trim()!=="") localStorage.setItem(SYNC_GIST_KEY,gistInput.trim());
+
+  try{
+    const id=await ensureGist();
+    await pullAndMerge();
+    await pushToGist();
+    if(!gistInput||gistInput.trim()===""){
+      alert("동기화 설정 완료!\nGist ID: "+id+"\n\n다른 기기에서도 🔄 버튼을 눌러 같은 토큰과 이 Gist ID를 입력하면 연결됩니다.");
+    }else{
+      alert("동기화 설정 완료!");
+    }
+  }catch(e){
+    alert("동기화 설정 실패: "+e.message);
+  }
+});
+
+if(getToken()&&getGistId()){
+  pullAndMerge();
+  setInterval(pullAndMerge,20000);
+}
 
 // ── 보기 전환 (작업별 / 날짜별) ──
 document.querySelectorAll(".tabbtn").forEach(btn=>{
