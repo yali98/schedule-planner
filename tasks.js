@@ -31,19 +31,20 @@ const PLANNER = {
     // ───────────────────────────────────────────────
     {
       id: "nrf",
-      title: "NRF 제안서 — 페르소나 + 장기대화",
+      title: "NRF 제안서 — 페르소나 + 장기대화 (기본연구B)",
       priority: 2,
       deadline: "2026-08-05",
       deadlineNote: "대략 8월 초 (확정 아님)",
-      note: "방향: on-device LLM은 크기 제약으로 general 정보 보유가 어려움 → 실생활 사용 위해 자율적 정보 관리 필수. KG(Wikidata/DBPedia 등)에 실생활 정보를 저장하고, 대화 중 사용자 정보(페르소나·대화)를 트리플화해 그래프에 추가. 핵심 모듈: graph construction, triple extraction, persona triple extraction, SLM distillation, graph completion, graph conflict detection, graph fusion.",
+      note: "기존 작성본(연구계획서_기본연구B_작성본.hwpx)을 내용적으로 더 손봐야 함. 방향(교수님 회의 반영): on-device는 sLM 기반 → 일반 상식은 KG가 아니라 sLM이 distillation 과정에서 보유하게 하고, KG에는 도메인 지식 + 페르소나만 저장. 기존 2번 '검색용 외부지식베이스'의 ConceptNet 상식그래프·위키피디아 범용지식은 제거 대상, 신문·행정문서는 도메인 지식으로 재편. 또 1번에 sLM on-device 동기 추가 필요, 3번 추진전략 표 2개(3년 vs 5년 로드맵) 상충 → 통일. 본문 수정뿐 아니라 대표 연구실적 5건 + 부속 서식(개인정보·과세 동의서, 신청자격·신분 확인서)도 같이 채워야 함. 참조: 2026 NRF/서식_추출/03. 핵심연구(기본연구B)/.",
       steps: [
-        { id: "nrf-1", date: "2026-07-01", text: "배경·필요성 초안 — on-device LLM 한계 + 자율적 정보 관리 필요성 정리" },
-        { id: "nrf-2", date: "2026-07-08", text: "관련 KG 자원 조사(Wikidata, DBPedia 등) + 그래프 저장 구조 설계" },
-        { id: "nrf-3", date: "2026-07-15", text: "Triple extraction + persona triple extraction 모듈 설계" },
-        { id: "nrf-4", date: "2026-07-22", text: "Graph construction + SLM distillation 방법론 정리" },
-        { id: "nrf-5", date: "2026-07-27", text: "Graph completion + conflict detection + fusion 방법론 정리" },
-        { id: "nrf-6", date: "2026-08-01", text: "연구목표·추진방법·기대효과 통합 작성" },
-        { id: "nrf-7", date: "2026-08-05", text: "전체 다듬기 + 제출" }
+        { id: "nrf-1", date: "2026-07-01", text: "방향 확정 — sLM(distillation)이 일반상식 보유 / KG는 도메인지식+페르소나만. 수정 범위·핵심 논리 1~2문단 정리" },
+        { id: "nrf-2", date: "2026-07-06", text: "1번 필요성 수정 — sLM on-device 제약 → 자율적 정보관리(도메인·페르소나 KG) 동기 추가, 상식 KG 전제 제거" },
+        { id: "nrf-3", date: "2026-07-11", text: "2번 목표·내용 수정 — 외부KB에서 상식/범용(ConceptNet·위키피디아) 삭제→도메인KB 재편, sLM distillation 상식 보유 서술 추가, 외부지식 모듈 재서술" },
+        { id: "nrf-4", date: "2026-07-16", text: "3번 추진전략·체계 정합화 — 상충 로드맵(3년 vs 5년) 통일, 외부지식팀 역할 재정의" },
+        { id: "nrf-5", date: "2026-07-21", text: "본문 전체 일관성 점검 + 4·5·6번 보강 — 제목·그림·연차목표·평가지표가 새 방향과 맞는지 교차검토" },
+        { id: "nrf-6", date: "2026-07-26", text: "대표 연구실적 5건 선정 + 요약문 작성(최근 5년, 질적 우수성·연구계획 연관성 중심) + 증빙 스캔 정리" },
+        { id: "nrf-7", date: "2026-07-31", text: "부속 서식 작성 — 개인정보·과세정보 제공활용 동의서 + 제3자 제공 동의서, 신청자격·신분 확인서" },
+        { id: "nrf-8", date: "2026-08-05", text: "전체 취합 + 분량(본문 5P 이내) 점검 + 다듬기 후 제출" }
       ]
     },
 
