@@ -293,7 +293,7 @@ async function pushToGist(){
 
 const undoStack=[];
 function setChecked(stepId,checked){
-  if(checked&&!checks[stepId]) undoStack.push(stepId);
+  if(checked&&!checks[stepId]) undoStack.push({type:"check",id:stepId});
   checks[stepId]=checked;
   meta[stepId]=Date.now();
   saveChecks();
@@ -308,6 +308,7 @@ function updateUndoBtn(){
 function hideTask(taskId){
   hidden[taskId]=true;
   meta["hidden:"+taskId]=Date.now();
+  undoStack.push({type:"hide",id:taskId});
   saveHidden();
   saveMeta();
   render();
@@ -417,9 +418,15 @@ render();
 $("#undo").addEventListener("click",()=>{
   const last=undoStack.pop();
   if(!last) return;
-  checks[last]=false;
-  meta[last]=Date.now();
-  saveChecks();
+  if(last.type==="hide"){
+    hidden[last.id]=false;
+    meta["hidden:"+last.id]=Date.now();
+    saveHidden();
+  }else{
+    checks[last.id]=false;
+    meta[last.id]=Date.now();
+    saveChecks();
+  }
   saveMeta();
   render();
   schedulePush();
