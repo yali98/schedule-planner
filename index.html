@@ -72,6 +72,9 @@
   .card.collapsed li:not(.urgent){display:none}
   .card.collapsed li.urgent{background:color-mix(in srgb,var(--red) 10%,transparent);border-radius:8px}
   .ttl{font-size:15px;font-weight:650;flex:1;min-width:160px}
+  .delBtn{background:transparent;border:1px solid var(--line);color:var(--muted);
+    font-size:11px;padding:3px 9px;border-radius:99px;cursor:pointer;flex-shrink:0}
+  .delBtn:hover{background:color-mix(in srgb,var(--red) 14%,transparent);color:var(--red);border-color:var(--red)}
   .dday{font-size:12px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
   .dday.red{background:color-mix(in srgb,var(--red) 18%,transparent);color:var(--red)}
   .dday.amber{background:color-mix(in srgb,var(--amber) 18%,transparent);color:var(--amber)}
@@ -164,6 +167,7 @@
   <div id="timeline" style="display:none"></div>
   <div class="foot">
     데이터 <code>tasks.js</code> · 마지막 계획 갱신 <span id="updated"></span>
+    <span id="hiddenNote"></span>
   </div>
 </div>
 
@@ -198,6 +202,10 @@ const KEY3="planner_meta_v1";
 const meta=JSON.parse(localStorage.getItem(KEY3)||"{}");
 const saveMeta=()=>localStorage.setItem(KEY3,JSON.stringify(meta));
 
+const KEY4="planner_hidden_v1";
+const hidden=JSON.parse(localStorage.getItem(KEY4)||"{}");
+const saveHidden=()=>localStorage.setItem(KEY4,JSON.stringify(hidden));
+
 // ── 기기 간 동기화 (GitHub Gist) ──
 const SYNC_TOKEN_KEY="planner_gh_token";
 const SYNC_GIST_KEY="planner_gist_id";
@@ -229,7 +237,7 @@ async function ensureGist(){
   const res=await ghFetch("https://api.github.com/gists",{
     method:"POST",
     body:JSON.stringify({description:"스케줄플래너 체크 동기화",public:false,
-      files:{[SYNC_FILENAME]:{content:JSON.stringify({checks:{},ts:{}})}}})
+      files:{[SYNC_FILENAME]:{content:JSON.stringify({checks:{},ts:{},hidden:{}})}}})
   });
   if(!res.ok) throw new Error("Gist 생성 실패 ("+res.status+")");
   const data=await res.json();
@@ -250,11 +258,17 @@ async function pullAndMerge(){
     Object.keys(remote.ts||{}).forEach(k=>{
       const rts=remote.ts[k];
       if(!meta[k]||rts>meta[k]){
-        if(checks[k]!==remote.checks[k]){ checks[k]=remote.checks[k]; changed=true; }
+        if(k.startsWith("hidden:")){
+          const tid=k.slice(7);
+          const rv=!!(remote.hidden&&remote.hidden[tid]);
+          if(!!hidden[tid]!==rv){ hidden[tid]=rv; changed=true; }
+        }else if(checks[k]!==remote.checks[k]){
+          checks[k]=remote.checks[k]; changed=true;
+        }
         meta[k]=rts;
       }
     });
-    if(changed){ saveChecks(); saveMeta(); render(); }
+    if(changed){ saveChecks(); saveHidden(); saveMeta(); render(); }
     setSyncStatus("ok");
   }catch(e){ setSyncStatus("error"); }
 }
@@ -270,7 +284,7 @@ async function pushToGist(){
     const id=await ensureGist();
     const res=await ghFetch(`https://api.github.com/gists/${id}`,{
       method:"PATCH",
-      body:JSON.stringify({files:{[SYNC_FILENAME]:{content:JSON.stringify({checks,ts:meta})}}})
+      body:JSON.stringify({files:{[SYNC_FILENAME]:{content:JSON.stringify({checks,ts:meta,hidden})}}})
     });
     if(!res.ok) throw new Error("push 실패");
     setSyncStatus("ok");
@@ -291,10 +305,21 @@ function updateUndoBtn(){
   $("#undo").disabled=undoStack.length===0;
 }
 
+function hideTask(taskId){
+  hidden[taskId]=true;
+  meta["hidden:"+taskId]=Date.now();
+  saveHidden();
+  saveMeta();
+  render();
+  schedulePush();
+}
+
 function render(){
   $("#today").textContent=fmtDate(todayStr)+" 기준";
   $("#updated").textContent=PLANNER.updated;
-  const tasks=[...PLANNER.tasks].sort((a,b)=>{
+  const hiddenCount=PLANNER.tasks.filter(t=>hidden[t.id]).length;
+  $("#hiddenNote").textContent=hiddenCount?` · 삭제 대기 ${hiddenCount}개 (다음 일정 정리 때 반영)`:"";
+  const tasks=[...PLANNER.tasks].filter(t=>!hidden[t.id]).sort((a,b)=>{
     const ax=a.deadline?daysBetween(todayStr,a.deadline):9999;
     const bx=b.deadline?daysBetween(todayStr,b.deadline):9999;
     if(ax!==bx) return ax-bx;
@@ -315,6 +340,7 @@ function render(){
         <span class="chevron">▾</span>
         <div class="ttl">${t.title}</div>
         <div class="dday ${allDone?'green':dl.cls}">${allDone?'완료 ✓':dl.txt}</div>
+        <button class="delBtn" title="목록에서 숨김 (다음 일정 정리 때 완전 삭제)">삭제</button>
       </div>
       <div class="meta">${t.deadline?`마감 ${fmtDate(t.deadline)} · `:''}${t.deadlineNote||''}</div>
       ${t.note?`<div class="note">${t.note}</div>`:''}
@@ -326,6 +352,10 @@ function render(){
       card.classList.toggle("collapsed",willBeCollapsed);
       expanded[t.id]=!willBeCollapsed;
       saveExpanded();
+    });
+    card.querySelector(".delBtn").addEventListener("click",e=>{
+      e.stopPropagation();
+      hideTask(t.id);
     });
     const ul=card.querySelector("ul");
     t.steps.forEach(s=>{
@@ -349,10 +379,13 @@ function render(){
 
 function renderTimeline(){
   const byDate={};
-  PLANNER.tasks.forEach(t=>t.steps.forEach(s=>{
-    if(checks[s.id]) return;
-    (byDate[s.date]=byDate[s.date]||[]).push({step:s,taskTitle:t.title});
-  }));
+  PLANNER.tasks.forEach(t=>{
+    if(hidden[t.id]) return;
+    t.steps.forEach(s=>{
+      if(checks[s.id]) return;
+      (byDate[s.date]=byDate[s.date]||[]).push({step:s,taskTitle:t.title});
+    });
+  });
   const dates=Object.keys(byDate).sort();
   const wrap=$("#timeline");wrap.innerHTML="";
   dates.forEach(date=>{

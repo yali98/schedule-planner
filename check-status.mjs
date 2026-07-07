@@ -54,7 +54,7 @@ async function findGistId(token) {
   return hit.id;
 }
 
-async function getChecks(token, gistId) {
+async function getSyncData(token, gistId) {
   const res = await gh(token, `https://api.github.com/gists/${gistId}`);
   const data = await res.json();
   const file = data.files[SYNC_FILENAME];
@@ -65,7 +65,7 @@ async function getChecks(token, gistId) {
     content = await (await fetch(file.raw_url)).text();
   }
   const parsed = JSON.parse(content || "{}");
-  return parsed.checks || {};
+  return { checks: parsed.checks || {}, hidden: parsed.hidden || {} };
 }
 
 async function main() {
@@ -75,7 +75,7 @@ async function main() {
 
   const cfg = loadConfig();
   const gistId = cfg.gistId || (await findGistId(cfg.token));
-  const checks = await getChecks(cfg.token, gistId);
+  const { checks, hidden } = await getSyncData(cfg.token, gistId);
   const planner = loadPlanner();
 
   let tasks = planner.tasks;
@@ -85,16 +85,26 @@ async function main() {
     const out = tasks.map((t) => ({
       id: t.id,
       title: t.title,
+      hidden: !!hidden[t.id],
       steps: t.steps.map((s) => ({ id: s.id, date: s.date, text: s.text, done: !!checks[s.id] })),
     }));
     console.log(JSON.stringify(out, null, 2));
     return;
   }
 
+  const pendingDeletion = planner.tasks.filter((t) => hidden[t.id]);
+  if (pendingDeletion.length) {
+    console.log(
+      `\n🗑 삭제 대기 (앱에서 "삭제" 버튼으로 숨김 처리됨 — tasks.js에서 완전히 제거할 것): ${pendingDeletion
+        .map((t) => t.id)
+        .join(", ")}`
+    );
+  }
+
   console.log(`\n📋 체크 현황  (Gist: ${gistId})\n`);
   for (const t of tasks) {
     const done = t.steps.filter((s) => checks[s.id]).length;
-    console.log(`■ ${t.title}  [${done}/${t.steps.length}]`);
+    console.log(`■ ${t.title}${hidden[t.id] ? "  [삭제 대기]" : ""}  [${done}/${t.steps.length}]`);
     for (const s of t.steps) {
       const mark = checks[s.id] ? "✅" : "⬜";
       console.log(`   ${mark} ${s.id}  (${s.date})  ${s.text}`);

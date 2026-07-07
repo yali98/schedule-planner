@@ -20,6 +20,7 @@ description: Add, update, remove, or reschedule tasks/steps in the personal plan
   ```
 
 ## 할 일
+0. `node check-status.mjs`를 실행해 "🗑 삭제 대기" 목록을 확인한다. 앱의 "삭제" 버튼은 task를 완전히 지우지 않고 숨김 처리만 하므로, 여기 나온 task id는 이번 편집에서 `tasks.js`에서 통째로 제거한다 (일괄 정리).
 1. 사용자 요청을 듣고 task 추가/삭제/수정/마감 변경을 판단.
    - 새 task 추가: 큰 목표를 받으면 합리적인 sub-step으로 쪼개고, 오늘 날짜(현재 맥락의 currentDate) 기준 마감일까지 날짜를 적절히 분배.
    - 기존 task 수정: 진행 상황(예: "초안 다 끝냈어")을 들으면 남은 steps만 남기고 재구성.
