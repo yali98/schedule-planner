@@ -61,6 +61,22 @@ const PLANNER = {
 
     // ───────────────────────────────────────────────
     {
+      id: "helea",
+      title: "HELEA 논문 — ACM 형식 변환 📝",
+      priority: 2,
+      deadline: "2026-08-24",
+      deadlineNote: "Abstract 8/17, Full paper 8/24",
+      note: "ACL에 냈던 HELEA 논문을 ACM 형식(acmart)으로 변환해 재제출. 새 연구가 아니라 포맷 변환이라 오래 걸리진 않지만 그림·표·참고문헌 스타일 손보는 게 조금 번거로움. Abstract 마감 8/17, Full paper 마감 8/24.",
+      steps: [
+        { id: "helea-1", date: "2026-08-10", text: "ACM 템플릿(acmart) 세팅 + 기존 ACL 원고 이관 시작 — 컬럼·폰트·섹션 구조 맞추기" },
+        { id: "helea-2", date: "2026-08-17", text: "Abstract 작성·정리 완료 (마감)" },
+        { id: "helea-3", date: "2026-08-21", text: "본문 ACM 형식 변환 — 그림·표·수식·참고문헌(ACM Reference Format) 스타일 정리" },
+        { id: "helea-4", date: "2026-08-24", text: "Full paper 최종 점검 + 제출 (마감)" }
+      ]
+    },
+
+    // ───────────────────────────────────────────────
+    {
       id: "class-ai",
       title: "도전학기 수업 — AI기반 전략적 의사결정 📚",
       priority: 2,
