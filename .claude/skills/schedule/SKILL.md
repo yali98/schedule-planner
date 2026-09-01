@@ -20,7 +20,7 @@ description: Add, update, remove, or reschedule tasks/steps in the personal plan
   ```
 
 ## 할 일
-0. `node check-status.mjs`를 실행해 "🗑 삭제 대기" 목록을 확인한다. 앱의 "삭제" 버튼은 task를 완전히 지우지 않고 숨김 처리만 하므로, 여기 나온 task id는 이번 편집에서 `tasks.js`에서 통째로 제거한다 (일괄 정리).
+0. **삭제 대기(앱 "삭제" 버튼으로 숨김된) task 제거는 이제 자동이다.** `tasks.js`를 Edit/Write하면 PostToolUse 훅이 `node prune-hidden.mjs --quiet`를 돌려 Gist의 hidden 목록에 있는 task를 `tasks.js`에서 통째로 잘라낸다(제거 후 정상 파싱 검증, 실패 시 파일 미변경). 따라서 수동으로 삭제 대기를 지울 필요는 없다 — 단, 편집 뒤 훅이 파일을 바꿨을 수 있으니 **git commit 전 tasks.js를 다시 읽어 반영 상태를 확인**할 것. 훅 설정: `.claude/settings.local.json`(gitignored). 필요하면 `node check-status.mjs`로 삭제 대기·체크 현황을 직접 볼 수도 있다(step 재구성 시 완료 여부 참고).
 1. 사용자 요청을 듣고 task 추가/삭제/수정/마감 변경을 판단.
    - 새 task 추가: 큰 목표를 받으면 합리적인 sub-step으로 쪼개고, 오늘 날짜(현재 맥락의 currentDate) 기준 마감일까지 날짜를 적절히 분배.
    - 기존 task 수정: 진행 상황(예: "초안 다 끝냈어")을 들으면 남은 steps만 남기고 재구성.
