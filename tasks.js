@@ -43,13 +43,13 @@ const PLANNER = {
       id: "next-topic",
       title: "논문 — diffusion LLM (WSDM short / NAACL 목표) 🧪",
       priority: 3,
-      deadline: "2026-10-12",
-      deadlineNote: "NAACL=ARR 10월 사이클 마감 10/12 / WSDM short는 edition 확인 필요 — 되면 제출",
-      note: "기존 다자대화+장기대화+페르소나 벤치마크는 다른 학생들에게 넘김. diffusion LLM 관련 연구를 WSDM short/NAACL 목표로 진행(대화 통합 벤치마크 트랙과는 별개). 조금씩 천천히 써보다 완성되면 제출, 무리면 다음 기회로 미루는 저우선 트랙. NAACL은 ACL Rolling Review 경유 — 10월 사이클 마감 10/12(→NAACL 2027).",
+      deadline: "2026-11-17",
+      deadlineNote: "WSDM 2027 short 마감 11/17 (또는 NAACL=ARR 10월 10/12) — 되면 제출",
+      note: "기존 다자대화+장기대화+페르소나 벤치마크는 다른 학생들에게 넘김. diffusion LLM 관련 연구를 WSDM short/NAACL 목표로 진행(대화 통합 벤치마크 트랙과는 별개). 조금씩 천천히 써보다 완성되면 제출, 무리면 다음 기회로 미루는 저우선 트랙. WSDM 2027 short 제출 마감 11/17(통지 12/18, 개최 2027.2.15~19 홍콩) / NAACL은 ACL Rolling Review 10월 사이클 마감 10/12(→NAACL 2027) — 둘 중 준비되는 쪽으로.",
       steps: [
         { id: "nt-20", date: "2026-09-28", text: "diffusion LLM 연구 방향·실험 셋업 구체화 + 관련 연구 정리" },
-        { id: "nt-21", date: "2026-10-08", text: "핵심 실험 진행 + 결과 정리 (short 분량 기준)" },
-        { id: "nt-22", date: "2026-10-12", text: "가능하면 WSDM short/NAACL(ARR 10월) 제출 (안 되면 다음 기회로)" }
+        { id: "nt-21", date: "2026-10-25", text: "핵심 실험 진행 + 결과 정리 (short 분량 기준) — 빠르면 ARR 10/12도 노려봄" },
+        { id: "nt-22", date: "2026-11-17", text: "가능하면 WSDM 2027 short 제출 (안 되면 다음 기회로)" }
       ]
     },
 
@@ -58,13 +58,13 @@ const PLANNER = {
       id: "dialogue-benchmark",
       title: "논문 후보 — 대화 통합 벤치마크 및 모델 💬",
       priority: 3,
-      deadline: "2026-10-12",
-      deadlineNote: "NAACL=ARR 10월 마감 10/12 / WSDM short edition 확인 필요 — 되면 제출",
-      note: "페르소나 벤치마크 대신 WSDM short/NAACL에 낼까 고민 중인 후보. diffusion LLM과는 별개 트랙 — 대화 통합 벤치마크 및 모델. 천천히 진행하다 가능하면 제출. NAACL은 ACL Rolling Review 경유(10월 사이클 마감 10/12 → NAACL 2027).",
+      deadline: "2026-11-17",
+      deadlineNote: "WSDM 2027 short 마감 11/17 (또는 NAACL=ARR 10월 10/12) — 되면 제출",
+      note: "페르소나 벤치마크 대신 WSDM short/NAACL에 낼까 고민 중인 후보. diffusion LLM과는 별개 트랙 — 대화 통합 벤치마크 및 모델. 천천히 진행하다 가능하면 제출. WSDM 2027 short 제출 마감 11/17(통지 12/18, 개최 2027.2.15~19 홍콩) / NAACL은 ACL Rolling Review 10월 사이클 마감 10/12 → NAACL 2027 — 둘 중 준비되는 쪽으로.",
       steps: [
         { id: "dialogue-benchmark-1", date: "2026-09-22", text: "대화 통합 벤치마크 설계 + 통합 모델 방향 정리" },
-        { id: "dialogue-benchmark-2", date: "2026-10-05", text: "벤치마크 구성·정제 + 모델 파일럿 실험" },
-        { id: "dialogue-benchmark-3", date: "2026-10-12", text: "가능하면 WSDM short/NAACL(ARR 10월) 제출" }
+        { id: "dialogue-benchmark-2", date: "2026-10-25", text: "벤치마크 구성·정제 + 모델 실험 진행 — 빠르면 ARR 10/12도 노려봄" },
+        { id: "dialogue-benchmark-3", date: "2026-11-17", text: "가능하면 WSDM 2027 short 제출 (안 되면 다음 기회로)" }
       ]
     }
   ]
