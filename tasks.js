@@ -1,28 +1,56 @@
 // ============================================================
 //  스케줄 데이터 — 이 파일은 Claude(이 세션)가 편집합니다.
 //  세부 목표 추가/기한 재배분이 필요하면 세션에서 말로 부탁하세요.
-//  마지막 갱신: 2026-09-01
+//  마지막 갱신: 2026-09-10
 // ============================================================
 
 const PLANNER = {
-  updated: "2026-09-01",
+  updated: "2026-09-10",
 
   tasks: [
     // ───────────────────────────────────────────────
     {
-      id: "dataset-qa",
-      title: "데이터셋 검수 관리 — 인턴 배분 🗂️",
+      id: "rag-presentation",
+      title: "RAG 수업 발표 준비 — Corpus-aware pre-training 논문 🎤",
       priority: 2,
-      deadline: "2026-09-04",
-      deadlineNote: "검수 파일 이번주(9/4)까지 완성 → 다음주(9/7)부터 매주 인턴 배분",
-      note: "데이터셋 검수 관리. 페르소나·토픽 모델링·번역 작업 검수 파일을 이번주 안에 만들어두는 게 선행 작업. 인턴 배분은 다음주(9/7)부터 시작해 매주 나눠주며 검수 진행·관리(반복 업무).",
+      deadline: "2026-10-13",
+      deadlineNote: "10/13 발표 — 자료는 일주일 전인 10/6까지 완성",
+      note: "발표 논문: Gao, Luyu, and Jamie Callan. \"Unsupervised corpus aware language model pre-training for dense passage retrieval.\" ACL 2022 (Long Papers). 발표자료는 10/6까지 완성하고 이후에는 리허설과 보완만 진행.",
       steps: [
-        { id: "dataset-qa-1", date: "2026-09-02", text: "페르소나 검수 파일 만들기" },
-        { id: "dataset-qa-2", date: "2026-09-03", text: "토픽 모델링 검수 파일 만들기" },
-        { id: "dataset-qa-3", date: "2026-09-04", text: "번역 작업 검수 파일 만들기 → 검수 파일 세트 완성 (이번주 금요일)" },
-        { id: "dataset-qa-4", date: "2026-09-07", text: "인턴 배분 시작 (다음주 월요일부터) + 이후 매주 검수 관리" }
+        { id: "rag-presentation-1", date: "2026-09-25", text: "논문 정독 + 핵심 문제·방법·실험·결론 요약" },
+        { id: "rag-presentation-2", date: "2026-10-02", text: "발표 구성 확정 + 핵심 그림·표 선정, 슬라이드 초안 작성" },
+        { id: "rag-presentation-3", date: "2026-10-06", text: "발표자료 완성 (발표 일주일 전)" },
+        { id: "rag-presentation-4", date: "2026-10-11", text: "발표 리허설 + 예상 질문 정리·슬라이드 보완" },
+        { id: "rag-presentation-5", date: "2026-10-13", text: "RAG 수업 발표" }
       ]
     },
+
+    // ───────────────────────────────────────────────
+    {
+      id: "rag-weekly-questions",
+      title: "RAG 수업 — 매주 질문 올리기 (14주) ❓",
+      priority: 2,
+      deadline: "2026-12-13",
+      deadlineNote: "9/13부터 14주간 매주 일요일 마감",
+      note: "매주 해당 주차 RAG 수업 자료를 읽고, 단순 요약보다 토론 가능한 질문을 하나 이상 작성해 일요일까지 올리기.",
+      steps: [
+        { id: "rag-question-1", date: "2026-09-13", text: "1주차 RAG 수업 질문 올리기 (일요일)" },
+        { id: "rag-question-2", date: "2026-09-20", text: "2주차 RAG 수업 질문 올리기 (일요일)" },
+        { id: "rag-question-3", date: "2026-09-27", text: "3주차 RAG 수업 질문 올리기 (일요일)" },
+        { id: "rag-question-4", date: "2026-10-04", text: "4주차 RAG 수업 질문 올리기 (일요일)" },
+        { id: "rag-question-5", date: "2026-10-11", text: "5주차 RAG 수업 질문 올리기 (일요일)" },
+        { id: "rag-question-6", date: "2026-10-18", text: "6주차 RAG 수업 질문 올리기 (일요일)" },
+        { id: "rag-question-7", date: "2026-10-25", text: "7주차 RAG 수업 질문 올리기 (일요일)" },
+        { id: "rag-question-8", date: "2026-11-01", text: "8주차 RAG 수업 질문 올리기 (일요일)" },
+        { id: "rag-question-9", date: "2026-11-08", text: "9주차 RAG 수업 질문 올리기 (일요일)" },
+        { id: "rag-question-10", date: "2026-11-15", text: "10주차 RAG 수업 질문 올리기 (일요일)" },
+        { id: "rag-question-11", date: "2026-11-22", text: "11주차 RAG 수업 질문 올리기 (일요일)" },
+        { id: "rag-question-12", date: "2026-11-29", text: "12주차 RAG 수업 질문 올리기 (일요일)" },
+        { id: "rag-question-13", date: "2026-12-06", text: "13주차 RAG 수업 질문 올리기 (일요일)" },
+        { id: "rag-question-14", date: "2026-12-13", text: "14주차 RAG 수업 질문 올리기 (일요일)" }
+      ]
+    },
+
 
     // ───────────────────────────────────────────────
     {
