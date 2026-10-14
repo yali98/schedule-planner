@@ -178,6 +178,25 @@ const PLANNER = {
         { id: "dialogue-benchmark-4", date: "2027-01-08", text: "논문 초안 완성 + 내부 검토" },
         { id: "dialogue-benchmark-5", date: "2027-01-15", text: "ARR 1월 사이클 제출 목표 (정확한 날짜 공지되면 조정)" }
       ]
+    },
+
+    // ───────────────────────────────────────────────
+    {
+      id: "entity-linking",
+      title: "논문 — Entity Linking 후속 연구 (ARR 1월 목표) 🔗",
+      priority: 2,
+      deadline: "2027-01-15",
+      deadlineNote: "ARR 1월 사이클(ACL 2027) 목표 — 결과가 안 나오면 다음 사이클로 이월 가능",
+      note: "메인 트랙 중 하나. 기존 Entity Alignment 방법론(PIE 등)을 Entity Linking으로 확장해봤으나 결과가 좋지 않아, 천천히 구체적으로 다시 설계하는 중. 비교 대상: ReFinED, gpt-oss-120b (+ PIE 등 기존 방법). 먼저 원인 분석 → 개선 방향 확정 → 파일럿으로 go/no-go 판단 후 본 실험으로 확대.",
+      steps: [
+        { id: "entity-linking-1", date: "2026-10-21", text: "현재 결과 error analysis — ReFinED·gpt-oss-120b 대비 어디서·왜 밀리는지 정리" },
+        { id: "entity-linking-2", date: "2026-10-30", text: "개선 방향 구체화 — Alignment→Linking 확장에서 안 맞는 가정 파악, 방법론 가설 정리" },
+        { id: "entity-linking-3", date: "2026-11-13", text: "개선안 구현 + 파일럿 실험" },
+        { id: "entity-linking-4", date: "2026-11-27", text: "go/no-go 판단 — 개선되면 본 실험 확대, 아니면 방향 재조정/다음 사이클로 이월" },
+        { id: "entity-linking-5", date: "2026-12-18", text: "전체 비교 실험(PIE·ReFinED·gpt-oss-120b) + ablation" },
+        { id: "entity-linking-6", date: "2027-01-08", text: "논문 초안 완성 + 내부 검토" },
+        { id: "entity-linking-7", date: "2027-01-15", text: "ARR 1월 사이클 제출 목표 (결과 따라 이월 가능)" }
+      ]
     }
   ]
 };
