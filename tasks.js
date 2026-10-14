@@ -1,13 +1,47 @@
 // ============================================================
 //  스케줄 데이터 — 이 파일은 Claude(이 세션)가 편집합니다.
 //  세부 목표 추가/기한 재배분이 필요하면 세션에서 말로 부탁하세요.
-//  마지막 갱신: 2026-09-17
+//  마지막 갱신: 2026-10-14
 // ============================================================
 
 const PLANNER = {
-  updated: "2026-09-17",
+  updated: "2026-10-14",
 
   tasks: [
+    // ───────────────────────────────────────────────
+    {
+      id: "taslp-multiparty",
+      title: "다자대화 논문 — IEEE TASLP 제출 📮",
+      priority: 1,
+      deadline: "2026-10-23",
+      deadlineNote: "다음주 금요일(10/23)까지 제출 목표",
+      note: "논문 형식은 TASLP에 맞춰 변경 완료. 제출 사항에 이전 투고에서 reject된 이유를 명시해야 해서, 해당 서술(reject 사유 + 이번 수정 반영 내역)을 작성 중.",
+      steps: [
+        { id: "taslp-multiparty-1", date: "2026-10-16", text: "이전 reject 사유 명시 서술 작성 완료 (진행 중)" },
+        { id: "taslp-multiparty-2", date: "2026-10-20", text: "사유별 수정 반영 내역을 본문과 대조 정리 + 전체 최종 점검(형식·참고문헌·그림)" },
+        { id: "taslp-multiparty-3", date: "2026-10-22", text: "제출 서류·업로드 준비 (cover letter, 파일 구성)" },
+        { id: "taslp-multiparty-4", date: "2026-10-23", text: "IEEE TASLP 제출" }
+      ]
+    },
+
+    // ───────────────────────────────────────────────
+    {
+      id: "dialogue-study",
+      title: "대화 스터디 (격주 수요일) 📚",
+      priority: 2,
+      deadline: "2026-12-23",
+      deadlineNote: "2주에 한 번, 10/14부터 시작 — 12/23까지 6회 (이후 연장 가능)",
+      note: "격주 수요일 대화 스터디. 오늘(10/14)부터 시작.",
+      steps: [
+        { id: "dialogue-study-1", date: "2026-10-14", text: "대화 스터디 1회차" },
+        { id: "dialogue-study-2", date: "2026-10-28", text: "대화 스터디 2회차" },
+        { id: "dialogue-study-3", date: "2026-11-11", text: "대화 스터디 3회차" },
+        { id: "dialogue-study-4", date: "2026-11-25", text: "대화 스터디 4회차" },
+        { id: "dialogue-study-5", date: "2026-12-09", text: "대화 스터디 5회차" },
+        { id: "dialogue-study-6", date: "2026-12-23", text: "대화 스터디 6회차" }
+      ]
+    },
+
     // ───────────────────────────────────────────────
     {
       id: "paper-seminar",
@@ -115,30 +149,34 @@ const PLANNER = {
     // ───────────────────────────────────────────────
     {
       id: "next-topic",
-      title: "논문 — diffusion LLM (WSDM short / NAACL 목표) 🧪",
-      priority: 3,
-      deadline: "2026-11-17",
-      deadlineNote: "WSDM 2027 short 마감 11/17 (또는 NAACL=ARR 10월 10/12) — 되면 제출",
-      note: "기존 다자대화+장기대화+페르소나 벤치마크는 다른 학생들에게 넘김. diffusion LLM 관련 연구를 WSDM short/NAACL 목표로 진행(대화 통합 벤치마크 트랙과는 별개). 조금씩 천천히 써보다 완성되면 제출, 무리면 다음 기회로 미루는 저우선 트랙. WSDM 2027 short 제출 마감 11/17(통지 12/18, 개최 2027.2.15~19 홍콩) / NAACL은 ACL Rolling Review 10월 사이클 마감 10/12(→NAACL 2027) — 둘 중 준비되는 쪽으로.",
+      title: "논문 — diffusion LLM (ARR 1월 / ACL 2027 목표) 🧪",
+      priority: 2,
+      deadline: "2027-01-15",
+      deadlineNote: "ARR 1월 사이클(ACL 2027) 목표 — 정확한 날짜 미공개, 내부 목표 1/15 (공지되면 조정)",
+      note: "메인 트랙 중 하나. ARR 10월 사이클(10/12)은 지나서 준비 기간을 늘림 — ACL 2027의 마지막 ARR 제출이 'January, 2027'로만 공지돼 있어 내부 목표를 1/15로 잡음. WSDM 2027 short(마감 11/17)는 일정이 되면 보너스로만 고려. 대화 벤치마크 트랙과는 별개.",
       steps: [
-        { id: "nt-20", date: "2026-09-28", text: "diffusion LLM 연구 방향·실험 셋업 구체화 + 관련 연구 정리" },
-        { id: "nt-21", date: "2026-10-25", text: "핵심 실험 진행 + 결과 정리 (short 분량 기준) — 빠르면 ARR 10/12도 노려봄" },
-        { id: "nt-22", date: "2026-11-17", text: "가능하면 WSDM 2027 short 제출 (안 되면 다음 기회로)" }
+        { id: "nt-20", date: "2026-10-21", text: "diffusion LLM 연구 방향·실험 셋업 확정 + 관련 연구 정리" },
+        { id: "nt-21", date: "2026-11-20", text: "핵심 실험 1차 결과 정리 (WSDM short 11/17은 사실상 패스, 되면 보너스)" },
+        { id: "nt-22", date: "2026-12-16", text: "추가 실험·ablation + 논문 초안 작성" },
+        { id: "nt-23", date: "2027-01-08", text: "초안 완성 + 내부 검토" },
+        { id: "nt-24", date: "2027-01-15", text: "ARR 1월 사이클 제출 목표 (정확한 날짜 공지되면 조정)" }
       ]
     },
 
     // ───────────────────────────────────────────────
     {
       id: "dialogue-benchmark",
-      title: "논문 후보 — 대화 통합 벤치마크 및 모델 💬",
-      priority: 3,
-      deadline: "2026-11-17",
-      deadlineNote: "WSDM 2027 short 마감 11/17 (또는 NAACL=ARR 10월 10/12) — 되면 제출",
-      note: "페르소나 벤치마크 대신 WSDM short/NAACL에 낼까 고민 중인 후보. diffusion LLM과는 별개 트랙 — 대화 통합 벤치마크 및 모델. 천천히 진행하다 가능하면 제출. WSDM 2027 short 제출 마감 11/17(통지 12/18, 개최 2027.2.15~19 홍콩) / NAACL은 ACL Rolling Review 10월 사이클 마감 10/12 → NAACL 2027 — 둘 중 준비되는 쪽으로.",
+      title: "대화 벤치마크 프레임워크 구축 + 논문 (ARR 1월 목표) 💬",
+      priority: 2,
+      deadline: "2027-01-15",
+      deadlineNote: "ARR 1월 사이클(ACL 2027) 목표 — 정확한 날짜 미공개, 내부 목표 1/15 (공지되면 조정)",
+      note: "메인 트랙 중 하나. 대화 통합 벤치마크 프레임워크 + 모델. diffusion LLM과는 별개 트랙. 이미 진행된 부분이 있어 설계 확정부터 이어가되, 10월 ARR 사이클을 놓쳤으므로 일정을 늦춰 1월 ARR(ACL 2027) 목표로 재배분. WSDM 2027 short(11/17)는 보너스.",
       steps: [
-        { id: "dialogue-benchmark-1", date: "2026-09-22", text: "대화 통합 벤치마크 설계 + 통합 모델 방향 정리" },
-        { id: "dialogue-benchmark-2", date: "2026-10-25", text: "벤치마크 구성·정제 + 모델 실험 진행 — 빠르면 ARR 10/12도 노려봄" },
-        { id: "dialogue-benchmark-3", date: "2026-11-17", text: "가능하면 WSDM 2027 short 제출 (안 되면 다음 기회로)" }
+        { id: "dialogue-benchmark-1", date: "2026-10-28", text: "벤치마크 프레임워크 설계 확정 — 태스크·스키마·평가 지표" },
+        { id: "dialogue-benchmark-2", date: "2026-11-25", text: "프레임워크 구현 + 데이터 구성·정제" },
+        { id: "dialogue-benchmark-3", date: "2026-12-23", text: "모델 실험·베이스라인 비교 + 결과 정리" },
+        { id: "dialogue-benchmark-4", date: "2027-01-08", text: "논문 초안 완성 + 내부 검토" },
+        { id: "dialogue-benchmark-5", date: "2027-01-15", text: "ARR 1월 사이클 제출 목표 (정확한 날짜 공지되면 조정)" }
       ]
     }
   ]
